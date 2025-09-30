@@ -50,4 +50,4 @@ A simple, fast, and customizable web application built with vanilla JavaScript a
 
 
 
-##Work In Progress - Tweaks coming, but not urgent... :)
+### Work In Progress - Tweaks coming, but not urgent... :)
