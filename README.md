@@ -49,4 +49,5 @@ A simple, fast, and customizable web application built with vanilla JavaScript a
 * **Tailwind CSS:** Styling and responsive design
 
 
-###Work In Progress - Tweaks coming, but not urgent... :)
+
+##Work In Progress - Tweaks coming, but not urgent... :)
