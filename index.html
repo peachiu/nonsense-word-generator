@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonsense Word Generator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        /* Custom hover effect for the button */
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(126, 34, 206, 0.5), 0 4px 6px -2px rgba(126, 34, 206, 0.2);
+        }
+
+        /* --- Advanced controls animation & sparkle --- */
+        #controlOptions {
+            position: relative; /* for pseudo-element sparkle */
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+            transition: max-height 420ms cubic-bezier(.2,.9,.2,1), opacity 300ms ease, transform 350ms cubic-bezier(.2,.8,.2,1);
+            /* keep the layout consistent while hidden */
+            border-color: rgba(0,0,0,0.06);
+        }
+
+        /* visible state */
+        #controlOptions.advanced-visible {
+            max-height: 900px; /* large enough to contain children */
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            box-shadow: 0 10px 30px rgba(124,58,237,0.08);
+            border-color: rgba(124,58,237,0.16);
+        }
+
+        /* tiny sparkle that pops when advanced is shown */
+        #controlOptions.advanced-visible::after {
+            content: "✨";
+            position: absolute;
+            right: 18px;
+            top: 10px;
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: translateY(-6px) scale(.7);
+            animation: popSpark 700ms cubic-bezier(.2,.8,.2,1) forwards;
+            pointer-events: none;
+        }
+        @keyframes popSpark {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4 mt-20 mb-20">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-lg bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-purple-100">
+
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4 text-center">
+            Nonsense Generator
+        </h1>
+        <p class="text-gray-500 mb-8 text-center">
+            Create a meaningless word from random characters, of any length and composition you choose.
+        </p>
+
+        <!-- Input and Button Area -->
+        <div class="flex flex-col space-y-4 mb-6">
+            <!-- Character Set Dropdown -->
+            <select
+                id="charMode"
+                class="w-full p-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 shadow-sm text-lg font-medium"
+                onchange="toggleControls(); generateNonsenseWord();"
+            >
+                <option value="every">Every Character (Alpha, Numeric, Symbols)</option>
+                <option value="alphanumeric">Alphanumeric (Letters & Numbers)</option>
+                <option value="alphabet">Alphabet Only (Letters)</option>
+                <option value="numeric">Numeric Only (0-9)</option>
+                <option value="custom">Custom (Use Advanced Controls below)</option>
+            </select>
+            
+            <!-- Length Input and Generate Button -->
+            <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <input
+                    type="number"
+                    id="wordLength"
+                    min="1"
+                    max="50"
+                    value="10"
+                    placeholder="Enter word length (1-50)"
+                    class="flex-grow p-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 shadow-sm text-lg text-center font-medium"
+                    oninput="generateNonsenseWord()"
+                >
+                <button
+                    id="generateButton"
+                    onclick="generateNonsenseWord()"
+                    class="generate-btn w-full sm:w-auto px-6 py-3 text-lg font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition duration-300 shadow-lg shadow-purple-200"
+                >
+                    Generate Word
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Controls Area (Toggles) -->
+        <div id="controlOptions" class="space-y-4 p-4 border border-gray-200 bg-white rounded-xl mb-8">
+            <p class="font-semibold text-gray-700 text-base border-b pb-2">Advanced Composition Controls:</p>
+
+            <!-- Character Inclusion Toggles -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Uppercase Toggle -->
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="includeUpper" checked class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onchange="generateNonsenseWord()">
+                    <span class="text-gray-700 select-none">Include Uppercase (A-Z)</span>
+                </label>
+                <!-- Lowercase Toggle -->
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="includeLower" checked class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onchange="generateNonsenseWord()">
+                    <span class="text-gray-700 select-none">Include Lowercase (a-z)</span>
+                </label>
+                <!-- Numbers Toggle -->
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="includeNumeric" checked class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onchange="generateNonsenseWord()">
+                    <span class="text-gray-700 select-none">Include Numbers (0-9)</span>
+                </label>
+                <!-- Symbols Toggle -->
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="includeSymbols" checked class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onchange="generateNonsenseWord()">
+                    <span class="text-gray-700 select-none">Include Symbols (!@#$)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="resultWordArea" class="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-300 min-h-[100px] flex flex-col justify-center items-center">
+            <p id="resultWord" class="text-3xl md:text-4xl font-extrabold text-purple-900 break-all text-center">
+                
+            </p>
+            <p id="message" class="text-gray-500 mt-2 text-sm">
+                Generated word will appear here.
+            </p>
+
+             <!-- Copy Button (initially hidden) -->
+             <button
+                id="copyButton"
+                onclick="copyToClipboard()"
+                class="mt-4 px-4 py-2 text-sm font-semibold text-purple-600 border border-purple-600 rounded-lg hover:bg-purple-100 transition duration-200 hidden"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v2M9 11h.01M15 15h.01M15 11h.01M9 15h.01" />
+                </svg>
+                Copy
+            </button>
+        </div>
+
+        <!-- Message Box for Feedback (instead of alert) -->
+        <div id="feedbackBox" class="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-xl shadow-xl transition-opacity duration-300 opacity-0 hidden">
+            Copied to clipboard!
+        </div>
+        <!-- Footer -->
+        <footer class="text-center text-gray-400 text-sm mt-9">
+            All rights reserved - <a href="https://github.com/peachiu">peachiu ✿</a> &copy;2025.
+        </footer>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Define the atomic character sets
+        const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+        const NUMERIC = '0123456789';
+        // A common set of symbols for password/nonsense generation
+        const SYMBOLS = '!@#$%^&*()-+=[]{}<>?'; 
+
+        const MAX_LENGTH = 50;
+        const MIN_LENGTH = 1;
+
+        // Element references
+        const wordLengthInput = document.getElementById('wordLength');
+        const charModeInput = document.getElementById('charMode');
+        const controlOptions = document.getElementById('controlOptions');
+        const resultWordElement = document.getElementById('resultWord');
+        const resultWordAreaElement = document.getElementById('resultWordArea');
+        const messageElement = document.getElementById('message');
+        const copyButton = document.getElementById('copyButton');
+        const feedbackBox = document.getElementById('feedbackBox');
+
+        // Checkbox references
+        const includeUpper = document.getElementById('includeUpper');
+        const includeLower = document.getElementById('includeLower');
+        const includeNumeric = document.getElementById('includeNumeric');
+        const includeSymbols = document.getElementById('includeSymbols');
+        
+        /**
+         * Toggles the visibility of the advanced control options based on the main mode selection.
+         * Uses a class so CSS handles the animation cleanly.
+         */
+        function toggleControls() {
+            const show = charModeInput && charModeInput.value === 'custom';
+            if (!controlOptions) return;
+
+            if (show) {
+                controlOptions.classList.add('advanced-visible');
+                controlOptions.setAttribute('aria-hidden', 'false');
+            } else {
+                // remove visible class — CSS will animate it closed
+                // r
+                controlOptions.classList.remove('advanced-visible');
+                controlOptions.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        // run on change and on initial load
+        if (charModeInput) charModeInput.addEventListener('change', toggleControls);
+        document.addEventListener('DOMContentLoaded', toggleControls);
+
+        /**
+         * Generates a random, nonsensical string based on user input for length, character mode, and inclusion toggles.
+         */
+        function generateNonsenseWord() {
+            const desiredLength = parseInt(wordLengthInput.value, 10);
+            const mode = charModeInput.value;
+            let charSet = '';
+            let modeLabel = '';
+            let finalWord = '';
+
+            // --- 1. Validation ---
+            if (isNaN(desiredLength) || desiredLength < MIN_LENGTH || desiredLength > MAX_LENGTH) {
+                resultWordElement.textContent = 'Error';
+                messageElement.textContent = `Please enter a number between ${MIN_LENGTH} and ${MAX_LENGTH}.`;
+                copyButton.classList.add('hidden');
+                return;
+            }
+
+            // --- 2. Determine Base Character Set based on Toggles/Mode ---
+            
+            // If the mode is NOT 'custom', the selection controls override the base toggles temporarily
+            if (mode === 'numeric') {
+                charSet = NUMERIC;
+                modeLabel = 'Numeric Only';
+            } else {
+                // For all other modes (including 'custom'), construct the character set based on the checkboxes
+                if (includeUpper.checked) charSet += UPPERCASE;
+                if (includeLower.checked) charSet += LOWERCASE;
+                if (includeNumeric.checked) charSet += NUMERIC;
+                if (includeSymbols.checked) charSet += SYMBOLS;
+                
+                modeLabel = mode === 'custom' ? 'Custom' : charModeInput.options[charModeInput.selectedIndex].text;
+            }
+            
+            if (charSet.length === 0) {
+                 resultWordElement.textContent = 'No Characters Selected';
+                 messageElement.textContent = `Please select at least one character type (e.g., Uppercase, Numbers, etc.).`;
+                 copyButton.classList.add('hidden');
+                 return;
+            }
+
+            // --- 3. Generation Logic ---
+            let result = '';
+            for (let i = 0; i < desiredLength; i++) {
+                const randomIndex = Math.floor(Math.random() * charSet.length);
+                result += charSet.charAt(randomIndex);
+            }
+
+            // --- 4. Display Result ---
+            resultWordElement.textContent = finalWord;
+            messageElement.textContent = `Generated ${modeLabel} word of length ${desiredLength}.`;
+            copyButton.classList.remove('hidden'); // Show copy button
+        }
+
+        /**
+         * Copies the generated word to the clipboard.
+         */
+        function copyToClipboard() {
+            const textToCopy = resultWordElement.textContent;
+            
+            if (!textToCopy || textToCopy === 'Error' || textToCopy === 'No Characters Selected') {
+                 return;
+            }
+
+            // Create a temporary textarea element for copying
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            
+            tempInput.select();
+            
+            try {
+                // Execute the copy command (iframe compatible)
+                document.execCommand('copy');
+                
+                // Show feedback message
+                feedbackBox.textContent = 'Word copied to clipboard!';
+                feedbackBox.classList.remove('hidden', 'opacity-0');
+                feedbackBox.classList.add('opacity-100', 'bg-purple-600');
+                
+                // Hide feedback message after 2 seconds
+                setTimeout(() => {
+                    feedbackBox.classList.remove('opacity-100');
+                    feedbackBox.classList.add('opacity-0');
+                    // Completely hide element after transition
+                    setTimeout(() => feedbackBox.classList.add('hidden', 'bg-green-500'), 300); // Revert to green for next copy
+                }, 2000);
+
+            } catch (err) {
+                console.error('Could not copy text: ', err);
+            } finally {
+                // Clean up the temporary element
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            // Ensure controls are visible based on default dropdown value
+            toggleControls(); 
+            // Generate the first word
+            generateNonsenseWord();
+        };
+
+    </script>
+</body>
+</html>
